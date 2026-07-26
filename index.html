@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- displays site properly based on user's device -->
+
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="./assets/images/favicon-32x32.png"
+        />
+        <link rel="stylesheet" href="./styles.css" />
+        <script src="./script.js" defer></script>
+
+        <title>Frontend Mentor | Multi-step form</title>
+    </head>
+    <body>
+        <!-- Sidebar start -->
+        <div class="multi-step-form">
+            <nav class="nav-bar">
+                <ul class="nav-panel">
+                    <li class="link">
+                        <p class="step-title nav-active">1</p>
+                        <span class="step-count">STEP 1</span>
+                        <span class="info">YOUR INFO</span>
+                    </li>
+                    <li class="link">
+                        <p class="step-title">2</p>
+                        <span class="step-count">STEP 2</span>
+                        <span class="info">SELECT PLAN</span>
+                    </li>
+                    <li class="link">
+                        <p class="step-title">3</p>
+                        <span class="step-count">STEP 3</span>
+                        <span class="info">ADD-ONS</span>
+                    </li>
+                    <li class="link">
+                        <p class="step-title">4</p>
+                        <span class="step-count">STEP 4</span>
+                        <span class="info">SUMMARY</span>
+                    </li>
+                </ul>
+            </nav>
+            <main class="form-area" id="multi-step-form">
+                <!-- Step 1 - Personal info -->
+                <section
+                    id="step-1"
+                    class="step step-active"
+                    data-step="1"
+                    data-stepState="true"
+                    aria-labelledby="step1-title"
+                >
+                    <div class="container">
+                        <h2 id="step1-title">Personal info</h2>
+                        <p class="lead">
+                            Please provide your name, email address, and phone number.
+                        </p>
+
+                        <form class="from-step-1" id="form-step-1" novalidate>
+                            <div class="form-control">
+                                <label for="name">Name</label>
+                                <input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    placeholder="e.g. Stephen King"
+                                    required
+                                    aria-required="true"
+                                    value="John"
+                                />
+                                <span class="error" aria-live="polite"></span>
+                            </div>
+
+                            <div class="form-control">
+                                <label for="email">Email Address</label>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    placeholder="e.g. stephenking@lorem.com"
+                                    required
+                                    aria-required="true"
+                                    value="john@test.com"
+                                />
+                                <span class="error" aria-live="polite"></span>
+                            </div>
+
+                            <div class="form-control">
+                                <label for="phone">Phone Number</label>
+                                <input
+                                    id="phone"
+                                    name="phone"
+                                    type="tel"
+                                    placeholder="e.g. +1 234 567 890"
+                                    required
+                                    aria-required="true"
+                                    value="+1234567890"
+                                />
+                                <span class="error" aria-live="polite"></span>
+                            </div>
+
+                            <div class="form-actions">
+                                <button
+                                    type="submit"
+                                    class="btn btn-next"
+                                    data-next-step="2"
+                                >
+                                    Next Step
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Step 2 - Select plan -->
+                <section
+                    id="step-2"
+                    class="step"
+                    data-step="2"
+                    data-stepState="false"
+                    aria-hidden="true"
+                    aria-labelledby="step2-title"
+                >
+                    <div class="container">
+                        <h2 id="step2-title">Select your plan</h2>
+                        <p class="lead">
+                            You have the option of monthly or yearly billing.
+                        </p>
+
+                        <div class="plans" role="radiogroup" aria-label="Available plans">
+                            <label class="plan-card">
+                                <input
+                                    type="radio"
+                                    name="plan"
+                                    value="arcade"
+                                    data-price-month="9"
+                                    data-price-year="90"
+                                    required
+                                    id="arcade"
+                                />
+                                <div class="plan-content">
+                                    <img
+                                        src="./assets/images/icon-arcade.svg"
+                                        alt="Arcade icon"
+                                        aria-hidden="true"
+                                    />
+                                    <div>
+                                        <div class="plan-name">Arcade</div>
+                                        <div class="plan-price">
+                                            <span class="price-month">$9/mo</span
+                                            ><span class="price-year" hidden>$90/yr</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="plan-card">
+                                <input
+                                    type="radio"
+                                    name="plan"
+                                    value="advanced"
+                                    data-price-month="12"
+                                    data-price-year="120"
+                                    id="advanced"
+                                />
+                                <div class="plan-content">
+                                    <img
+                                        src="./assets/images/icon-advanced.svg"
+                                        alt="Advanced icon"
+                                        aria-hidden="true"
+                                    />
+                                    <div>
+                                        <div class="plan-name">Advanced</div>
+                                        <div class="plan-price">
+                                            <span class="price-month">$12/mo</span
+                                            ><span class="price-year" hidden
+                                                >$120/yr</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <label class="plan-card">
+                                <input
+                                    type="radio"
+                                    name="plan"
+                                    value="pro"
+                                    data-price-month="15"
+                                    data-price-year="150"
+                                    id="pro"
+                                />
+                                <div class="plan-content">
+                                    <img
+                                        src="./assets/images/icon-pro.svg"
+                                        alt="Pro icon"
+                                        aria-hidden="true"
+                                    />
+                                    <div>
+                                        <div class="plan-name">Pro</div>
+                                        <div class="plan-price">
+                                            <span class="price-month">$15/mo</span
+                                            ><span class="price-year" hidden
+                                                >$150/yr</span
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="billing-toggle">
+                            <span class="label">Monthly</span>
+                            <label class="switch">
+                                <input
+                                    id="billingToggle"
+                                    type="checkbox"
+                                    aria-label="Toggle billing frequency"
+                                />
+                                <span class="slider"></span>
+                            </label>
+                            <span class="label">Yearly</span>
+                        </div>
+
+                        <div class="form-actions">
+                            <button
+                                type="button"
+                                class="btn btn-prev"
+                                data-prev-step="1"
+                                id="toStep1BackBtn"
+                            >
+                                Go Back
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-next"
+                                data-next-step="3"
+                                id="toStep3NextBtn"
+                            >
+                                Next Step
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Step 3 - Add-ons -->
+                <section
+                    id="step-3"
+                    class="step"
+                    data-step="3"
+                    data-stepState="false"
+                    aria-hidden="true"
+                    aria-labelledby="step3-title"
+                >
+                    <div class="container">
+                        <h2 id="step3-title">Pick add-ons</h2>
+                        <p class="lead">Add-ons help enhance your gaming experience.</p>
+
+                        <form id="form-step-3" class="form-step-3">
+                            <label class="addon">
+                                <div class="input-wrapper">
+                                    <input
+                                        type="checkbox"
+                                        name="addon"
+                                        value="online-service"
+                                        data-price-month="1"
+                                        data-price-year="10"
+                                        id="onlineService"
+                                    />
+                                </div>
+                                <div class="addon-content">
+                                    <div class="addon-title">Online service</div>
+                                    <div class="addon-desc">
+                                        Access to multiplayer games
+                                    </div>
+                                </div>
+                                <div class="addon-price">
+                                    <span class="price-month">+$1/mo</span
+                                    ><span class="price-year" hidden>+$10/yr</span>
+                                </div>
+                            </label>
+
+                            <label class="addon">
+                                <div class="input-wrapper">
+                                    <input
+                                        type="checkbox"
+                                        name="addon"
+                                        value="larger-storage"
+                                        data-price-month="2"
+                                        data-price-year="20"
+                                        id="largerStorage"
+                                    />
+                                </div>
+                                <div class="addon-content">
+                                    <div class="addon-title">Larger storage</div>
+                                    <div class="addon-desc">Extra 1TB of cloud save</div>
+                                </div>
+                                <div class="addon-price">
+                                    <span class="price-month">+$2/mo</span
+                                    ><span class="price-year" hidden>+$20/yr</span>
+                                </div>
+                            </label>
+
+                            <label class="addon">
+                                <div class="input-wrapper">
+                                    <input
+                                        type="checkbox"
+                                        name="addon"
+                                        value="custom-profile"
+                                        data-price-month="2"
+                                        data-price-year="20"
+                                        id="customProfile"
+                                    />
+                                </div>
+                                <div class="addon-content">
+                                    <div class="addon-title">Customizable Profile</div>
+                                    <div class="addon-desc">
+                                        Custom theme on your profile
+                                    </div>
+                                </div>
+                                <div class="addon-price">
+                                    <span class="price-month">+$2/mo</span
+                                    ><span class="price-year" hidden>+$20/yr</span>
+                                </div>
+                            </label>
+
+                            <div class="form-actions">
+                                <button
+                                    type="button"
+                                    class="btn btn-prev"
+                                    data-prev-step="2"
+                                    id="toStep2BackBtn"
+                                >
+                                    Go Back
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-next"
+                                    data-next-step="4"
+                                    id="toStep4NextBtn"
+                                >
+                                    Next Step
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Step 4 - Summary -->
+                <section
+                    id="step-4"
+                    class="step"
+                    data-step="4"
+                    data-stepState="false"
+                    aria-hidden="true"
+                    aria-labelledby="step4-title"
+                >
+                    <div class="container">
+                        <h2 id="step4-title">Finishing up</h2>
+                        <p class="lead">
+                            Double-check everything looks OK before confirming.
+                        </p>
+
+                        <div class="summary">
+                            <div class="summary-plan">
+                                <strong class="summary-plan-name" id="summary-plan-name"
+                                    >Arcade (Monthly)</strong
+                                >
+                                <button
+                                    type="button"
+                                    class="btn btn-change"
+                                    id="btn-change-plan"
+                                    data-prev-step="2"
+                                >
+                                    change
+                                </button>
+                                <span class="summary-plan-price" id="summary-plan-price"
+                                    >$9/mo</span
+                                >
+                            </div>
+
+                            <ul class="summary-addons-list" id="summary-addons">
+                                <li
+                                    class="summary-addon"
+                                    id="summary-addon-1"
+                                    data-addonstate="false"
+                                >
+                                    <span
+                                        class="summary-addon-name"
+                                        id="summary-addon-name-1"
+                                        >Online service</span
+                                    >
+                                    <span
+                                        class="summary-addon-price"
+                                        id="summary-addon-price-1"
+                                        >$1/mo</span
+                                    >
+                                </li>
+                                <li
+                                    class="summary-addon"
+                                    id="summary-addon-2"
+                                    data-addonstate="false"
+                                >
+                                    <span
+                                        class="summary-addon-name"
+                                        id="summary-addon-name-2"
+                                        >Larger storage</span
+                                    >
+                                    <span
+                                        class="summary-addon-price"
+                                        id="summary-addon-price-2"
+                                        >$2/mo</span
+                                    >
+                                </li>
+                                <li
+                                    class="summary-addon"
+                                    id="summary-addon-3"
+                                    data-addonstate="false"
+                                >
+                                    <span
+                                        class="summary-addon-name"
+                                        id="summary-addon-name-3"
+                                        >Custom Profile</span
+                                    >
+                                    <span
+                                        class="summary-addon-price"
+                                        id="summary-addon-price-3"
+                                        >$2/mo</span
+                                    >
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="summary-total">
+                            <span id="summary-total">Total (per month)</span>
+                            <strong class="summary-total-price" id="summary-total-price"
+                                >$10/mo</strong
+                            >
+                        </div>
+
+                        <div class="form-actions">
+                            <button
+                                type="button"
+                                class="btn btn-prev"
+                                id="toStep3BackBtn"
+                                data-prev-step="3"
+                            >
+                                Go Back
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-confirm"
+                                id="toStep5ConfirmBtn"
+                            >
+                                Confirm
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Step 5 - Thank you -->
+                <section
+                    id="step-5"
+                    class="step step-complete"
+                    data-step="5"
+                    data-stepState="false"
+                    aria-hidden="true"
+                    aria-labelledby="step5-title"
+                >
+                    <div class="container thank-you">
+                        <img
+                            src="./assets/images/icon-thank-you.svg"
+                            alt="Thank you"
+                            aria-hidden="true"
+                        />
+                        <h2 id="step5-title">Thank you!</h2>
+                        <p class="lead">
+                            Thanks for confirming your subscription! We hope you have fun
+                            using our platform. If you ever need support, please feel free
+                            to email us at
+                            <a href="mailto:dhayk87@gmail.com">dhayk87@gmail.com</a>.
+                        </p>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Step 5 end -->
+
+            <footer class="attribution">
+                Challenge by
+                <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>.
+                Coded by <a href="https://github.com/DHayk87">DHayk</a>.
+            </footer>
+        </div>
+    </body>
+</html>
