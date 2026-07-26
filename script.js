@@ -1,374 +1,361 @@
 //   ┌── [INFO] ──────────────────────────────────────────────────────────────────┐
-//   │ step 1                                                                     │
+//   │ Step 1                                                                     │
 //   └────────────────────────────────────────────────────────────────────────────┘
-const steps = document.querySelectorAll(".step");
+const steps = Array.from(document.querySelectorAll(".step"));
+const stepTitles = Array.from(document.querySelectorAll(".step-title"));
 const formStep1 = document.getElementById("form-step-1");
-const nameInput = document.getElementById("name");
-const emailInput = document.getElementById("email");
-const phoneInput = document.getElementById("phone");
-const errorMessages = document.querySelectorAll(".error");
-const stepTitles = document.querySelectorAll(".step-title");
-
-const stepOne = 1;
-const stepTwo = 2;
-const stepThree = 3;
-const stepFour = 4;
-
-const stepData = {
-    onlineService: 0,
-    storage: 0,
-    profile: 0,
-    name: null,
-    email: null,
-    phone: null,
-    plan: null,
-    price: null,
-    addOnsPrice: null
+const personalInputs = {
+    name: document.getElementById("name"),
+    email: document.getElementById("email"),
+    phone: document.getElementById("phone"),
+};
+const personalErrors = {
+    name: document.querySelector("#name + .error"),
+    email: document.querySelector("#email + .error"),
+    phone: document.querySelector("#phone + .error"),
 };
 
-const stepState = {
-    step1: false,
-    step2: false,
-    step3: false,
-    step4: false
-}
+const planData = {
+    arcade: { label: "Arcade", monthly: 9, yearly: 90 },
+    advanced: { label: "Advanced", monthly: 12, yearly: 120 },
+    pro: { label: "Pro", monthly: 15, yearly: 150 },
+};
 
-const errorState = {
+const state = {
+    currentStep: 1,
+    billingMonthly: true,
+    step1Completed: false,
+    step2Completed: false,
+    step3Completed: false,
+    step4Completed: false,
+    personalInfo: {
+        name: "",
+        email: "",
+        phone: "",
+    },
+    selectedPlan: null,
+    planPrice: 0,
+    selectedAddons: [],
+    addOnsPrice: 0,
+};
+
+const validationRules = {
     name: /^.{3,}$/,
     email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
     phone: /^\+[1-9]\d{1,14}$/,
+};
+
+function formatPrice(value, monthly = true) {
+    return `$${value}/${monthly ? "mo" : "yr"}`;
+}
+
+function setFieldError(input, errorElement, message) {
+    input.classList.add("input-error");
+    if (errorElement) {
+        errorElement.textContent = message;
+    }
+}
+
+function clearFieldError(input, errorElement) {
+    input.classList.remove("input-error");
+    if (errorElement) {
+        errorElement.textContent = "";
+    }
+}
+
+function validateField(fieldName, value) {
+    if (value === "") {
+        return { isValid: false, message: "this field is required" };
+    }
+
+    if (!validationRules[fieldName].test(value)) {
+        return { isValid: false, message: "invalid format" };
+    }
+
+    return { isValid: true, message: "" };
 }
 
 function updateUI(stepNumber) {
+    state.currentStep = stepNumber;
+
     steps.forEach((step, index) => {
-        step.classList.remove("step-active");
-        step.dataset.stepstate = "false";
-        step.setAttribute("aria-hidden", "true");
-        
-        if (index < 4) {
-            stepTitles[index].classList.remove("nav-active");
-        }
+        const isActive = index + 1 === stepNumber;
+        step.classList.toggle("step-active", isActive);
+        step.dataset.stepstate = String(isActive);
+        step.setAttribute("aria-hidden", String(!isActive));
     });
 
-    const currentStepIndex = stepNumber - 1;
-    if (steps[currentStepIndex]) {
-        steps[currentStepIndex].classList.add("step-active");
-        steps[currentStepIndex].dataset.stepstate = "true";
-        steps[currentStepIndex].setAttribute("aria-hidden", "false");
+    stepTitles.forEach((title, index) => {
+        const isNavActive = index + 1 === stepNumber && stepNumber < 5;
+        title.classList.toggle("nav-active", isNavActive);
+    });
+}
+
+function updateUrl(stepNumber, replace = false) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("step", String(stepNumber));
+    const method = replace ? "replaceState" : "pushState";
+    history[method]({ step: stepNumber }, "", `${url.pathname}${url.search}`);
+}
+
+function getValidStep(targetStep) {
+    if (targetStep >= 2 && !state.step1Completed) {
+        return 1;
     }
-    
-    const navIndex = currentStepIndex < 4 ? currentStepIndex : 3;
-    if (stepTitles[navIndex]) {
-        stepTitles[navIndex].classList.add("nav-active");
-    }
+
+    return targetStep;
 }
 
 function goToStep(stepNumber) {
     updateUI(stepNumber);
-    history.pushState({ step: stepNumber }, "", `?step=${stepNumber}`);
+    updateUrl(stepNumber);
 }
 
-window.addEventListener("popstate", (event) => {
-    const stepNumber = event.state ? event.state.step : 1;
-    updateUI(stepNumber);
-});
+function handlePersonalFieldInput(fieldName) {
+    const input = personalInputs[fieldName];
+    const errorElement = personalErrors[fieldName];
+    const value = input.value.trim();
+    const validation = validateField(fieldName, value);
 
-function getValidStep(targetStep) {
-    if (targetStep >= 2 && !stepState.step1) return 1;
-    // На будущее для Step 3 / Step 4:
-    // if (targetStep >= 3 && !stepState.step2) return 2;
-    return targetStep;
+    if (!validation.isValid) {
+        setFieldError(input, errorElement, validation.message);
+    } else {
+        clearFieldError(input, errorElement);
+    }
+
+    state.personalInfo[fieldName] = value;
 }
 
-// Initialize state
-const urlParams = new URLSearchParams(window.location.search);
-const requestedStep = parseInt(urlParams.get("step")) || 1;
-const initialStep = getValidStep(requestedStep);
-history.replaceState({ step: initialStep }, "", `?step=${initialStep}`);
-updateUI(initialStep);
-
-const nextStep = () => {
-    const currentStepIndex = [...steps].findIndex(step => step.dataset.stepstate === "true");
-    if (currentStepIndex >= 0 && currentStepIndex < steps.length - 1) {
-        goToStep(currentStepIndex + 2);
-    }
-}
-
-
-nameInput.addEventListener("input", () => {
-    const name = nameInput.value.trim();
-    if (name === "") {
-        errorMessages[0].textContent = "this field is required";
-        nameInput.className = "input-error";
-    } else if (!errorState.name.test(name)) {
-        errorMessages[0].textContent = "invalid format";
-        nameInput.className = "input-error";
-    } else {
-        errorMessages[0].textContent = "";
-        nameInput.className = "";
-    }
-});
-emailInput.addEventListener("input", () => {
-    const email = emailInput.value.trim();
-    if (email === "") {
-        errorMessages[1].textContent = "this field is required";
-        emailInput.className = "input-error";
-    } else if (!errorState.email.test(email)) {
-        errorMessages[1].textContent = "invalid format";
-        emailInput.className = "input-error";
-    } else {
-        errorMessages[1].textContent = "";
-        emailInput.className = "";
-    }
-});
-phoneInput.addEventListener("input", () => {
-    const phone = phoneInput.value.trim();
-    if (phone === "") {
-        errorMessages[2].textContent = "this field is required";
-        phoneInput.className = "input-error";
-    } else if (!errorState.phone.test(phone)) {
-        errorMessages[2].textContent = "invalid format";
-        phoneInput.className = "input-error";
-    } else {
-        errorMessages[2].textContent = "";
-        phoneInput.className = "";
-    }
-});
-
-formStep1.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim();
-    const phone = phoneInput.value.trim();
-
+function validateStepOne() {
+    const values = {};
     let isValid = true;
 
-    if (name === "") {
-        nameInput.className = "input-error";
-        errorMessages[0].textContent = "this field is required";
-        isValid = false;
-    } else if (!errorState.name.test(name)) {
-        nameInput.className = "input-error";
-        errorMessages[0].textContent = "invalid format";
-        isValid = false;
-    } else {
-        nameInput.className = "";
-        errorMessages[0].textContent = "";
-    }
+    Object.entries(personalInputs).forEach(([fieldName, input]) => {
+        const value = input.value.trim();
+        const validation = validateField(fieldName, value);
+        const errorElement = personalErrors[fieldName];
 
-    if (email === "") {
-        emailInput.className = "input-error";
-        errorMessages[1].textContent = "this field is required";
-        isValid = false;
-    } else if (!errorState.email.test(email)) {
-        emailInput.className = "input-error";
-        errorMessages[1].textContent = "invalid format";
-        isValid = false;
-    } else {
-        emailInput.className = "";
-        errorMessages[1].textContent = "";
-    }
-
-    if (phone === "") {
-        phoneInput.className = "input-error";
-        errorMessages[2].textContent = "this field is required";
-        isValid = false;
-    } else if (!errorState.phone.test(phone)) {
-        phoneInput.className = "input-error";
-        errorMessages[2].textContent = "invalid format";
-        isValid = false;
-    } else {
-        phoneInput.className = "";
-        errorMessages[2].textContent = "";
-    }
-
-    if (isValid) {
-        stepData.name = name;
-        stepData.email = email;
-        stepData.phone = phone;
-        stepState.step1 = true;
-        nextStep();
-    }
-});
-
-//   ┌── [INFO] ──────────────────────────────────────────────────────────────────┐
-//   │ step 2                                                                     │
-//   └────────────────────────────────────────────────────────────────────────────┘
-
-const billingToggle = document.getElementById("billingToggle");
-const planPrice = document.querySelectorAll(".plan-price span");
-const arcade = document.getElementById("arcade");
-const advanced = document.getElementById("advanced");
-const pro = document.getElementById("pro");
-const toStep1BackBtn = document.getElementById("toStep1BackBtn");
-const toStep3NextBtn = document.getElementById("toStep3NextBtn");
-const planCard = document.querySelectorAll(".plan-card");
-const addOnPrice = document.querySelectorAll(".addon-price span");
-const monthlyDiscount = document.querySelectorAll(".monthly-discount");
-
-const planData = {
-    arcade: {
-        monthly: 9,
-        yearly: 90
-    },
-    advanced: {
-        monthly: 12,
-        yearly: 120
-    },
-    pro: {
-        monthly: 15,
-        yearly: 150
-    }
-};
-
-let isBillingMonthly = true;
-
-billingToggle.addEventListener("change", () => {
-    const priceMonthSpan = document.querySelectorAll(".price-month");
-    const priceYearSpan = document.querySelectorAll(".price-year");
-    if (billingToggle.checked) {
-        isBillingMonthly = false;
-        priceMonthSpan.forEach((price) => price.hidden = true);
-        priceYearSpan.forEach((price) => price.hidden = false);
-        monthlyDiscount.forEach((discount) => discount.classList.add("monthly-discount-show"));
-    } else {
-        isBillingMonthly = true;
-        priceMonthSpan.forEach((price) => price.hidden = false);
-        priceYearSpan.forEach((price) => price.hidden = true);
-        monthlyDiscount.forEach((discount) => discount.classList.remove("monthly-discount-show"));
-    }
-});
-
-toStep1BackBtn.addEventListener("click", () => {
-    goToStep(1);
-});
-
-toStep3NextBtn.addEventListener("click", () => {
-        if (arcade.checked) {
-            stepData.plan = "arcade";
-            stepData.price = isBillingMonthly ? planData.arcade.monthly : planData.arcade.yearly;
-            goToStep(3);
-        } else if (advanced.checked) {
-            stepData.plan = "advanced";
-            stepData.price = isBillingMonthly ? planData.advanced.monthly : planData.advanced.yearly;
-            goToStep(3);
-        } else if (pro.checked) {
-            stepData.plan = "pro";
-            stepData.price = isBillingMonthly ? planData.pro.monthly : planData.pro.yearly;
-            goToStep(3);
-        }else {
-            planCard.forEach((card) => card.classList.add("input-error"));
-            setTimeout(() => {
-                planCard.forEach((card) => card.classList.remove("input-error"));
-            }, 2000);
+        if (!validation.isValid) {
+            setFieldError(input, errorElement, validation.message);
+            isValid = false;
+        } else {
+            clearFieldError(input, errorElement);
         }
-    console.log(stepData);
-});
 
+        values[fieldName] = value;
+    });
 
-//   ┌── [INFO] ──────────────────────────────────────────────────────────────────┐
-//   │ step 3                                                                     │
-//   └────────────────────────────────────────────────────────────────────────────┘
+    return { isValid, values };
+}
 
-const toStep2BackBtn = document.getElementById("toStep2BackBtn");
-const toStep4NextBtn = document.getElementById("toStep4NextBtn");
+function updateBillingUI() {
+    const priceMonthSpans = document.querySelectorAll(".price-month");
+    const priceYearSpans = document.querySelectorAll(".price-year");
+    const discounts = document.querySelectorAll(".monthly-discount");
 
-const summaryPlanName = document.getElementById("summary-plan-name");
-const summaryPlanPrice = document.getElementById("summary-plan-price");
+    priceMonthSpans.forEach((price) => {
+        price.hidden = !state.billingMonthly;
+    });
 
-const summaryAddonPrice1 = document.getElementById("summary-addon-price-1");
-const summaryAddonPrice2 = document.getElementById("summary-addon-price-2");
-const summaryAddonPrice3 = document.getElementById("summary-addon-price-3");
-const summaryTotalPrice = document.getElementById("summary-total-price");
+    priceYearSpans.forEach((price) => {
+        price.hidden = state.billingMonthly;
+    });
 
-toStep2BackBtn.addEventListener("click", () => {
-    stepData.step3 = false;
-    goToStep(2);
-});
+    discounts.forEach((discount) => {
+        discount.classList.toggle("monthly-discount-show", !state.billingMonthly);
+    });
+}
 
-toStep4NextBtn.addEventListener("click", () => {
-    stepData.step3 = true;
-    const onlineService = document.getElementById("onlineService");
-    const storage = document.getElementById("largerStorage");
-    const profile = document.getElementById("customProfile");
-    let addOnsPrice = 0
-    if (onlineService.checked) {
-        stepData.onlineService = 1;
-        addOnsPrice += isBillingMonthly ? 1 : 10;
-    } else {
-        stepData.onlineService = 0;
+function highlightPlanError() {
+    const planCards = document.querySelectorAll(".plan-card");
+    planCards.forEach((card) => card.classList.add("input-error"));
+
+    window.setTimeout(() => {
+        planCards.forEach((card) => card.classList.remove("input-error"));
+    }, 2000);
+}
+
+function getSelectedPlan() {
+    return document.querySelector('input[name="plan"]:checked');
+}
+
+function saveSelectedPlan() {
+    const selectedPlanInput = getSelectedPlan();
+
+    if (!selectedPlanInput) {
+        return false;
     }
-    if (storage.checked) {
-        stepData.storage = 1;
-        addOnsPrice += isBillingMonthly ? 2 : 20;
-    } else {
-        stepData.storage = 0;
-    }
-    if (profile.checked) {
-        stepData.profile = 1;
-        addOnsPrice += isBillingMonthly ? 2 : 20;
-    } else {
-        stepData.profile = 0;
-    }
-    stepData.addOnsPrice = addOnsPrice;
 
-    if (stepData.plan === "arcade") {
-        summaryPlanName.textContent = "Arcade";
-        summaryPlanPrice.textContent = isBillingMonthly ? "$9/mo" : "$90/yr";
-        summaryAddonPrice1.textContent = isBillingMonthly ? "$1/mo" : "$10/yr";
-        summaryAddonPrice2.textContent = isBillingMonthly ? "$2/mo" : "$20/yr";
-        summaryAddonPrice3.textContent = isBillingMonthly ? "$2/mo" : "$20/yr";
-    } else if (stepData.plan === "advanced") {
-        summaryPlanName.textContent = "Advanced";
-        summaryPlanPrice.textContent = isBillingMonthly ? "$12/mo" : "$120/yr";
-        summaryAddonPrice1.textContent = isBillingMonthly ? "$1/mo" : "$10/yr";
-        summaryAddonPrice2.textContent = isBillingMonthly ? "$2/mo" : "$20/yr";
-        summaryAddonPrice3.textContent = isBillingMonthly ? "$2/mo" : "$20/yr";
-    } else if (stepData.plan === "pro") {
-        summaryPlanName.textContent = "Pro";
-        summaryPlanPrice.textContent = isBillingMonthly ? "$15/mo" : "$150/yr";
-        summaryAddonPrice1.textContent = isBillingMonthly ? "$1/mo" : "$10/yr";
-        summaryAddonPrice2.textContent = isBillingMonthly ? "$2/mo" : "$20/yr";
-        summaryAddonPrice3.textContent = isBillingMonthly ? "$2/mo" : "$20/yr";
-    }
-    if (stepData.onlineService === 1) {
-        summaryAddonPrice1.textContent = isBillingMonthly ? "$1/mo" : "$10/yr";
-        summaryAddonPrice1.parentElement.setAttribute("data-addonstate", "true");
-    }
-    if (stepData.storage === 1) {
-        summaryAddonPrice2.textContent = isBillingMonthly ? "$2/mo" : "$20/yr";
-        summaryAddonPrice2.parentElement.setAttribute("data-addonstate", "true");
-    }
-    if (stepData.profile === 1) {
-        summaryAddonPrice3.textContent = isBillingMonthly ? "$2/mo" : "$20/yr";
-        summaryAddonPrice3.parentElement.setAttribute("data-addonstate", "true");
-    }
-    summaryTotalPrice.textContent = stepData.price + stepData.addOnsPrice;
-    goToStep(4);
-    console.log(stepData);
-});
+    const planKey = selectedPlanInput.value;
+    const plan = planData[planKey];
 
-//   ┌── [INFO] ──────────────────────────────────────────────────────────────────┐
-//   │ step 4                                                                     │
-//   └────────────────────────────────────────────────────────────────────────────┘
+    if (!plan) {
+        return false;
+    }
 
+    state.selectedPlan = planKey;
+    state.planPrice = state.billingMonthly ? plan.monthly : plan.yearly;
+    state.step2Completed = true;
+    return true;
+}
 
-const btnChangePlan = document.getElementById("btn-change-plan");
-const toStep3BackBtn = document.getElementById("toStep3BackBtn");
-const toStep5ConfirmBtn = document.getElementById("toStep5ConfirmBtn");
-toStep3BackBtn.addEventListener("click", () => {
-    summaryAddonPrice1.parentElement.setAttribute("data-addonstate", "false");
-    summaryAddonPrice2.parentElement.setAttribute("data-addonstate", "false");
-    summaryAddonPrice3.parentElement.setAttribute("data-addonstate", "false");
-    stepData.step4 = false;
-    goToStep(3);
-});
-toStep5ConfirmBtn.addEventListener("click", () => {
-    stepData.step4 = true;
-    goToStep(5);
-});    
+function renderSummary() {
+    const plan = planData[state.selectedPlan];
 
-btnChangePlan.addEventListener("click", () => {
-    stepData.step4 = false;
-    goToStep(2);
-});
+    if (!plan) {
+        return;
+    }
+
+    const summaryPlanName = document.getElementById("summary-plan-name");
+    const summaryPlanPrice = document.getElementById("summary-plan-price");
+    const summaryAddonPrice1 = document.getElementById("summary-addon-price-1");
+    const summaryAddonPrice2 = document.getElementById("summary-addon-price-2");
+    const summaryAddonPrice3 = document.getElementById("summary-addon-price-3");
+    const summaryTotalPrice = document.getElementById("summary-total-price");
+
+    summaryPlanName.textContent = `${plan.label} (${state.billingMonthly ? "Monthly" : "Yearly"})`;
+    summaryPlanPrice.textContent = formatPrice(
+        state.billingMonthly ? plan.monthly : plan.yearly,
+        state.billingMonthly,
+    );
+
+    const addonSummary = [
+        {
+            element: summaryAddonPrice1,
+            container: document.getElementById("summary-addon-1"),
+            input: document.getElementById("onlineService"),
+        },
+        {
+            element: summaryAddonPrice2,
+            container: document.getElementById("summary-addon-2"),
+            input: document.getElementById("largerStorage"),
+        },
+        {
+            element: summaryAddonPrice3,
+            container: document.getElementById("summary-addon-3"),
+            input: document.getElementById("customProfile"),
+        },
+    ];
+
+    addonSummary.forEach(({ element, container, input }) => {
+        const isActive = input.checked;
+        container.setAttribute("data-addonstate", isActive ? "true" : "false");
+        const priceValue = Number(
+            input.dataset[state.billingMonthly ? "priceMonth" : "priceYear"],
+        );
+        element.textContent = isActive
+            ? formatPrice(priceValue, state.billingMonthly)
+            : formatPrice(priceValue, state.billingMonthly);
+    });
+
+    summaryTotalPrice.textContent = formatPrice(
+        state.planPrice + state.addOnsPrice,
+        state.billingMonthly,
+    );
+}
+
+function resetSummaryState() {
+    document.querySelectorAll(".summary-addon").forEach((item) => {
+        item.setAttribute("data-addonstate", "false");
+    });
+}
+
+function init() {
+    Object.entries(personalInputs).forEach(([fieldName, input]) => {
+        input.addEventListener("input", () => handlePersonalFieldInput(fieldName));
+    });
+
+    formStep1.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const { isValid, values } = validateStepOne();
+
+        if (!isValid) {
+            return;
+        }
+
+        state.personalInfo = values;
+        state.step1Completed = true;
+        goToStep(2);
+    });
+
+    const billingToggle = document.getElementById("billingToggle");
+    billingToggle.addEventListener("change", () => {
+        state.billingMonthly = !billingToggle.checked;
+        updateBillingUI();
+    });
+
+    const toStep1BackBtn = document.getElementById("toStep1BackBtn");
+    const toStep3NextBtn = document.getElementById("toStep3NextBtn");
+    const toStep2BackBtn = document.getElementById("toStep2BackBtn");
+    const toStep4NextBtn = document.getElementById("toStep4NextBtn");
+    const btnChangePlan = document.getElementById("btn-change-plan");
+    const toStep3BackBtn = document.getElementById("toStep3BackBtn");
+    const toStep5ConfirmBtn = document.getElementById("toStep5ConfirmBtn");
+
+    toStep1BackBtn.addEventListener("click", () => {
+        goToStep(1);
+    });
+
+    toStep3NextBtn.addEventListener("click", () => {
+        if (!saveSelectedPlan()) {
+            highlightPlanError();
+            return;
+        }
+
+        goToStep(3);
+    });
+
+    toStep2BackBtn.addEventListener("click", () => {
+        state.step3Completed = false;
+        goToStep(2);
+    });
+
+    toStep4NextBtn.addEventListener("click", () => {
+        const addonInputs = Array.from(document.querySelectorAll('input[name="addon"]'));
+        const selectedAddons = addonInputs.filter((input) => input.checked);
+
+        state.selectedAddons = selectedAddons.map((input) => input.value);
+        state.addOnsPrice = selectedAddons.reduce((total, input) => {
+            const priceValue = Number(
+                input.dataset[state.billingMonthly ? "priceMonth" : "priceYear"],
+            );
+            return total + priceValue;
+        }, 0);
+        state.step2Completed = true;
+        state.step3Completed = true;
+        state.step4Completed = true;
+        renderSummary();
+        goToStep(4);
+    });
+
+    toStep3BackBtn.addEventListener("click", () => {
+        resetSummaryState();
+        state.step4Completed = false;
+        goToStep(3);
+    });
+
+    toStep5ConfirmBtn.addEventListener("click", () => {
+        state.step4Completed = true;
+        goToStep(5);
+    });
+
+    btnChangePlan.addEventListener("click", () => {
+        state.step4Completed = false;
+        goToStep(2);
+    });
+
+    window.addEventListener("popstate", (event) => {
+        const stepNumber = event.state ? event.state.step : 1;
+        updateUI(stepNumber);
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedStep = Number.parseInt(urlParams.get("step"), 10) || 1;
+    const initialStep = getValidStep(requestedStep);
+
+    updateUrl(initialStep, true);
+    updateBillingUI();
+    updateUI(initialStep);
+}
+
+init();

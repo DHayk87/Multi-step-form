@@ -22,9 +22,10 @@
         <title>Frontend Mentor | Multi-step form</title>
     </head>
     <body>
+        <a href="#multi-step-form" class="skip-link">Skip to main form</a>
         <!-- Sidebar start -->
         <div class="multi-step-form">
-            <nav class="nav-bar">
+            <nav class="nav-bar" aria-label="Form progress">
                 <ul class="nav-panel">
                     <li class="link">
                         <p class="step-title nav-active">1</p>
@@ -48,7 +49,8 @@
                     </li>
                 </ul>
             </nav>
-            <main class="form-area" id="multi-step-form">
+            <main class="form-area" id="multi-step-form" tabindex="-1" aria-labelledby="form-title">
+                <h1 class="visually-hidden" id="form-title">Multi-step form</h1>
                 <!-- Step 1 - Personal info -->
                 <section
                     id="step-1"
@@ -75,9 +77,11 @@
                                         placeholder="e.g. Stephen King"
                                         required
                                         aria-required="true"
+                                        aria-describedby="name-error"
+                                        autocomplete="name"
                                         value="John"
                                     />
-                                    <span class="error" aria-live="polite"></span>
+                                    <span id="name-error" class="error" aria-live="polite"></span>
                                 </div>
 
                                 <div class="form-control">
@@ -89,9 +93,12 @@
                                         placeholder="e.g. stephenking@lorem.com"
                                         required
                                         aria-required="true"
+                                        aria-describedby="email-error"
+                                        autocomplete="email"
+                                        inputmode="email"
                                         value="john@test.com"
                                     />
-                                    <span class="error" aria-live="polite"></span>
+                                    <span id="email-error" class="error" aria-live="polite"></span>
                                 </div>
 
                                 <div class="form-control">
@@ -103,9 +110,12 @@
                                         placeholder="e.g. +1 234 567 890"
                                         required
                                         aria-required="true"
+                                        aria-describedby="phone-error"
+                                        autocomplete="tel"
+                                        inputmode="tel"
                                         value="+1234567890"
                                     />
-                                    <span class="error" aria-live="polite"></span>
+                                    <span id="phone-error" class="error" aria-live="polite"></span>
                                 </div>
                             </div>
 
@@ -140,11 +150,13 @@
                                 You have the option of monthly or yearly billing.
                             </p>
 
-                            <div
+                            <fieldset
                                 class="plans"
                                 role="radiogroup"
                                 aria-label="Available plans"
+                                style="border: 0; margin: 0; padding: 0;"
                             >
+                                <legend style="position: absolute; left: -9999px;">Choose a plan</legend>
                                 <label class="plan-card">
                                     <input
                                         type="radio"
@@ -235,7 +247,7 @@
                                         </div>
                                     </div>
                                 </label>
-                            </div>
+                            </fieldset>
 
                             <div class="billing-toggle">
                                 <span class="label">Monthly</span>
@@ -361,6 +373,7 @@
                                         ><span class="price-year" hidden>+$20/yr</span>
                                     </div>
                                 </label>
+                                </fieldset>
                             </div>
                             <div class="step-bottom">
                                 <div class="form-actions">
@@ -534,13 +547,6 @@
                 </section>
             </main>
 
-            <!-- Step 5 end -->
-
-            <footer class="attribution">
-                Challenge by
-                <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>.
-                Coded by <a href="https://github.com/DHayk87">DHayk</a>.
-            </footer>
         </div>
     </body>
 </html>
