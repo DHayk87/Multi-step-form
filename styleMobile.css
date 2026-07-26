@@ -59,10 +59,10 @@ a {
 }
 .container {
     margin: auto;
-    width: 80%;
+    width: 100%;
 }
 main {
-    height: calc(100% - 2.5rem);
+    min-height: calc(100% - 2.5rem);
 }
 /* 
   ┌── [INFO] ──────────────────────────────────────────────────────────────────┐
@@ -71,44 +71,46 @@ main {
 */
 
 .multi-step-form {
-    width: 70%;
-    margin: 10vh auto;
-    min-height: 80vh;
-    padding: var(--space-xl);
+    width: 100%;
     display: grid;
     align-items: flex-start;
-    grid-template-columns: 25% 78%;
-    grid-template-rows: 100%;
-    background-color: var(--color-neutral-white);
+    grid-template-columns: 1fr;
     border-radius: 1.25rem;
 }
 .nav-bar {
-    border-radius: 1.25rem;
     min-height: 100%;
     background-color: var(--color-primary-blue-950);
     background-image: url("./assets/images/bg-sidebar-desktop.svg");
     background-size: cover;
+    background-position: 0 80%;
 }
 
 .nav-panel {
-    padding: var(--space-xxl);
-    display: grid;
-    gap: 2.5rem;
+    padding: clamp(var(--space-xxs), 5vw, var(--space-md));
+    padding-top: var(--space-xxl);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(var(--space-sm), 2vw, var(--space-xxl));
+    min-height: 250px;
 }
 .link {
     display: grid;
     grid-template-columns: 3.125rem auto;
     justify-content: flex-start;
     align-items: center;
-    gap: 0 1.25rem;
+    gap: 0;
     color: var(--color-neutral-white);
     font-weight: var(--font-weight-bold);
+}
+.link span {
+    display: none;
 }
 .step-title {
     text-align: center;
     line-height: 3rem;
     border: solid 0.0625rem var(--color-primary-blue-200);
-    grid-row: span 2;
+    grid-row: span 1;
     border-radius: 50%;
     aspect-ratio: 1;
 }
@@ -122,7 +124,10 @@ main {
     ) !important;
     color: var(--color-primary-blue-950);
 }
-
+.form-area {
+    margin-top: -100px;
+    border-radius: 1.25rem;
+}
 /* 
   ┌── [INFO] ──────────────────────────────────────────────────────────────────┐
   │ Steps                                                                      │
@@ -131,8 +136,7 @@ main {
 
 .step {
     display: none;
-    padding: var(--space-xxl);
-    height: 100%;
+    height: calc(100vh - 150px);
 }
 .step .container {
     height: 100%;
@@ -142,6 +146,18 @@ main {
 
 .step-active {
     display: block;
+}
+.step-top{
+    background-color: var(--color-neutral-white);
+    padding: var(--space-lg);
+    border-radius: 1.25rem;
+    margin-inline: var(--space-lg);
+}
+.step-bottom{
+    margin-top: auto;
+    padding: var(--space-lg);
+    background-color: var(--color-neutral-white);
+    text-align: right;
 }
 
 .step h2 {
@@ -176,7 +192,7 @@ main {
     color: var(--color-primary-red-500);
     font-weight: var(--font-weight-bold);
 }
-.input-error{
+.input-error {
     border-color: var(--color-primary-red-500) !important;
 }
 .form-actions {
@@ -195,8 +211,8 @@ main {
     }
 }
 
-.from-step-1 {
-    height: 90%;
+.form-step-1 {
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -209,10 +225,10 @@ main {
 
 .plans {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(1, 1fr);
     gap: 1rem;
     width: 100%;
-    margin-top: 2rem;
+    margin-top: 1rem;
     border: none;
 }
 .plan-card {
@@ -237,12 +253,23 @@ main {
     border: 0.0625rem solid var(--color-primary-purple-600);
     background-color: var(--color-neutral-blue-50);
 }
+.plan-content {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 1rem;
+}
 .plan-content img {
-    margin-bottom: 2.5rem;
+    margin-bottom: 0;
 }
 .plan-name {
     font-weight: var(--font-weight-bold);
-    margin-bottom: 0.5rem;
+}
+.monthly-discount{
+    display: none;
+}
+.monthly-discount-show{
+    display: block;
 }
 .billing-toggle {
     display: flex;
@@ -298,7 +325,6 @@ input:checked + .slider {
     }
 }
 
-
 /* 
   ┌── [INFO] ──────────────────────────────────────────────────────────────────┐
   │ select add-ons card                                                        │
@@ -308,45 +334,46 @@ input:checked + .slider {
 .form-step-3 {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;    
+    gap: 1.5rem;
     height: 100%;
 }
 .addon {
     display: grid;
-    grid-template-columns: 50px auto auto;
+    grid-template-columns: minmax(auto, 50px) auto auto;
     align-items: center;
-    gap:0 1.5rem;
+    gap: 0 1.5rem;
     border: 0.0625rem solid var(--color-neutral-purple-200);
     border-radius: 0.75rem;
     padding: 1.5rem;
 }
-.addon:hover{
+.addon:not(:last-of-type){
+    margin-bottom: 1.5rem;
+}
+
+.addon:hover {
     border-color: var(--color-primary-purple-600);
 }
-.addon:has(input:checked){
+.addon:has(input:checked) {
     border-color: var(--color-primary-purple-600);
     background-color: var(--color-neutral-blue-50);
 }
-.addon .input-wrapper{
+.addon .input-wrapper {
     grid-row: span 2;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 1.5rem;
-    
 }
 
-.addon-title{
+.addon-title {
     font-weight: var(--font-weight-medium);
     color: var(--color-neutral-blue-950);
-    
 }
-.addon-desc{
+.addon-desc {
     color: var(--color-neutral-gray-500);
-    
 }
-.addon-price{
-    color: var(--color-primary-purple-600) ;
+.addon-price {
+    color: var(--color-primary-purple-600);
     text-align: right;
 }
 
@@ -356,74 +383,72 @@ input:checked + .slider {
   └────────────────────────────────────────────────────────────────────────────┘ 
 */
 
-.summary{
+.summary {
     display: flex;
     flex-direction: column;
     width: 100%;
     padding: 1.5rem;
     background-color: var(--color-neutral-blue-50);
-    border-radius:0.75rem;
+    border-radius: 0.75rem;
 }
 
-.summary-plan{
+.summary-plan {
     display: grid;
     align-items: center;
     justify-content: space-between;
     gap: 0 1.5rem;
-    grid-template-columns: auto auto;   
+    grid-template-columns: auto auto;
     padding-bottom: 1.5rem;
     border-bottom: solid 1px var(--color-neutral-purple-200);
 }
-.summary-plan .summary-plan-name{
+.summary-plan .summary-plan-name {
     font-weight: var(--font-weight-bold);
     color: var(--color-neutral-blue-950);
 }
-.summary-plan-price{
+.summary-plan-price {
     grid-column: 2;
-    grid-row: 1/ span 2;
+    grid-row: 1 / span 2;
     font-weight: var(--font-weight-bold);
     color: var(--color-primary-blue-950);
 }
 
-.btn-change{
+.btn-change {
     all: unset;
     cursor: pointer;
     text-decoration: underline;
     font-weight: var(--font-weight-medium);
     color: var(--color-neutral-blue-950);
-    &:hover{
+    &:hover {
         color: var(--color-primary-purple-600);
     }
 }
 
-.summary-addon{
+.summary-addon {
     display: none;
     align-items: center;
     justify-content: space-between;
-    grid-template-columns: auto auto;   
+    grid-template-columns: auto auto;
     background-color: var(--color-neutral-blue-50);
     border-top: none;
     padding: 1.5rem 0;
 }
 
-.summary-addon[data-addonstate="true"]{
+.summary-addon[data-addonstate="true"] {
     display: grid;
 }
 
-.summary-addon:last-of-type{
+.summary-addon:last-of-type {
     border-bottom: none;
 }
 
-.summary-total{
+.summary-total {
     display: grid;
     align-items: center;
     justify-content: space-between;
-    grid-template-columns: auto auto;   
+    grid-template-columns: auto auto;
     padding: 1.5rem;
     background-color: var(--color-neutral-white);
-    
 }
-
 
 /* 
   ┌── [INFO] ──────────────────────────────────────────────────────────────────┐
@@ -431,21 +456,25 @@ input:checked + .slider {
   └────────────────────────────────────────────────────────────────────────────┘
 */
 
-.thank-you{
+.container.thank-you {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 1.5rem;
-    width: 100%;
-    height: 100%;
     text-align: center;
+    background-color: var(--color-neutral-white);
+    height: auto;    
+    width: auto;
+    margin: var(--space-lg);
+    padding: var(--space-xxl) var(--space-lg);
+    border-radius: 0.75rem;
+    font-size: 1.25rem;
 }
-
 
 /* -------------------------------------*/
 
 .attribution {
-    grid-column: span 2;
+    /* grid-column: span 2; */
     text-align: center;
 }

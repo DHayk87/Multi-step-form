@@ -204,6 +204,7 @@ const toStep1BackBtn = document.getElementById("toStep1BackBtn");
 const toStep3NextBtn = document.getElementById("toStep3NextBtn");
 const planCard = document.querySelectorAll(".plan-card");
 const addOnPrice = document.querySelectorAll(".addon-price span");
+const monthlyDiscount = document.querySelectorAll(".monthly-discount");
 
 const planData = {
     arcade: {
@@ -229,13 +230,13 @@ billingToggle.addEventListener("change", () => {
         isBillingMonthly = false;
         priceMonthSpan.forEach((price) => price.hidden = true);
         priceYearSpan.forEach((price) => price.hidden = false);
+        monthlyDiscount.forEach((discount) => discount.classList.add("monthly-discount-show"));
     } else {
         isBillingMonthly = true;
         priceMonthSpan.forEach((price) => price.hidden = false);
         priceYearSpan.forEach((price) => price.hidden = true);
+        monthlyDiscount.forEach((discount) => discount.classList.remove("monthly-discount-show"));
     }
-    console.log(priceYearSpan)
-    console.log(priceMonthSpan)
 });
 
 toStep1BackBtn.addEventListener("click", () => {
